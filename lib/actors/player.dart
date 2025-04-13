@@ -8,6 +8,10 @@ enum PlayerState {
   running,
 }
 
+enum PlayerDirection {
+  left, right, none
+}
+
 class Player extends SpriteAnimationGroupComponent
     with HasGameRef<PixelAdventure> {
 
@@ -16,6 +20,16 @@ class Player extends SpriteAnimationGroupComponent
 
   late final SpriteAnimation idleAnimation;
   late final SpriteAnimation runningAnimation;
+
+  PlayerDirection playerDirection = PlayerDirection.none;
+  double moveSpeed = 100;
+  Vector2 velocity = Vector2.zero();
+
+  @override
+  void update(double dt) {
+    _updatePlayerMovement(dt);
+    super.update(dt);
+  }
 
   @override
   FutureOr<void> onLoad() {
@@ -45,5 +59,22 @@ class Player extends SpriteAnimationGroupComponent
             textureSize: Vector2(32, 32)
         )
     );
+  }
+
+  void _updatePlayerMovement(double dt){
+    double dirX = 0.0;
+    switch (playerDirection) {
+      case PlayerDirection.left:
+        dirX -= moveSpeed;
+        break;
+      case PlayerDirection.right:
+        dirX += moveSpeed;
+        break;
+      case PlayerDirection.none:
+        break;
+      default:
+    }
+    velocity = Vector2(dirX, 0.0);
+    position += velocity * dt;
   }
 }

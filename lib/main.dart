@@ -4,5 +4,6 @@ import 'package:my_app/pixel_adventure.dart';
 
 void main() {
   final game = PixelAdventure();
+
   runApp(GameWidget(game: game));
 }
