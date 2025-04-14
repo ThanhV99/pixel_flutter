@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
 import 'package:my_app/actors/player.dart';
 
 import 'levels/level.dart';
@@ -16,6 +16,9 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents {
   Player player = Player(character: 'Pink Man');
   String levelName = 'level_1';
   late final CameraComponent cam;
+  // joystick
+  late JoystickComponent joystick;
+  bool isShowJoyStick = true;
 
   @override
   FutureOr<void> onLoad() async {
@@ -30,6 +33,49 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents {
       world: world,
     );
     cam.viewfinder.anchor = Anchor.topLeft;
+
     addAll([cam, world]);
+    if (isShowJoyStick){
+      addJoyStick();
+    }
+  }
+
+  @override
+  void update(double dt){
+    if (isShowJoyStick){
+      updateJoyStick();
+    }
+    super.update(dt);
+  }
+
+  void addJoyStick() {
+    joystick = JoystickComponent(
+      knob: CircleComponent(radius: 20, paint: Paint()..color = Colors.grey),
+      background: CircleComponent(
+        radius: 50,
+        paint: Paint()..color = Colors.grey.withValues(alpha: 0.3),
+      ),
+      margin: const EdgeInsets.only(left: 40, bottom: 40),
+    );
+
+    cam.viewport.add(joystick);
+  }
+
+  void updateJoyStick (){
+    switch (joystick.direction){
+      case JoystickDirection.upLeft:
+      case JoystickDirection.downLeft:
+      case JoystickDirection.left:
+        player.playerDirection = PlayerDirection.left;
+        break;
+      case JoystickDirection.upRight:
+      case JoystickDirection.downRight:
+      case JoystickDirection.right:
+        player.playerDirection = PlayerDirection.right;
+        break;
+      default:
+        player.playerDirection = PlayerDirection.none;
+        break;
+    }
   }
 }
