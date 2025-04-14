@@ -18,7 +18,7 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents {
   late final CameraComponent cam;
   // joystick
   late JoystickComponent joystick;
-  bool isShowJoyStick = true;
+  bool isShowJoyStick = false;
 
   @override
   FutureOr<void> onLoad() async {
@@ -66,15 +66,15 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents {
       case JoystickDirection.upLeft:
       case JoystickDirection.downLeft:
       case JoystickDirection.left:
-        player.playerDirection = PlayerDirection.left;
+        player.horizontalMovement = -1;
         break;
       case JoystickDirection.upRight:
       case JoystickDirection.downRight:
       case JoystickDirection.right:
-        player.playerDirection = PlayerDirection.right;
+        player.horizontalMovement = 1;
         break;
       default:
-        player.playerDirection = PlayerDirection.none;
+        player.horizontalMovement = 0;
         break;
     }
   }
