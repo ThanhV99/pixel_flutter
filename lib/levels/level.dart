@@ -3,33 +3,69 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:my_app/actors/player.dart';
+import 'package:my_app/levels/collision_block.dart';
 
-class Level extends World {
+class Level extends World with HasCollisionDetection {
   final String levelName;
   final Player player;
+
   Level({required this.levelName, required this.player});
 
   late TiledComponent level;
+  List<CollisionBlock> collisionBlocks = [];
 
   @override
-  FutureOr<void> onLoad() async{
+  FutureOr<void> onLoad() async {
     level = await TiledComponent.load('$levelName.tmx', Vector2(16, 16));
     add(level);
-    
+
+    // spawn point of player
     final spawnPointsLayer = level.tileMap.getLayer<ObjectGroup>('Spawnpoint');
-
-    for (final spawnPoint in spawnPointsLayer!.objects){
-      switch (spawnPoint.class_){
-        case 'player':
-          player.position = Vector2(spawnPoint.x, spawnPoint.y);
-          add(player);
-          break;
-        default:
-
+    if (spawnPointsLayer != null) {
+      for (final spawnPoint in spawnPointsLayer.objects) {
+        switch (spawnPoint.class_) {
+          case 'player':
+            player.position = Vector2(spawnPoint.x, spawnPoint.y);
+            add(player);
+            break;
+          default:
+        }
       }
     }
 
+    final collisionsLayer = level.tileMap.getLayer<ObjectGroup>('Collisions');
+    if (collisionsLayer != null) {
+      for (final collision in collisionsLayer.objects) {
+        switch (collision.class_) {
+          case 'Platform':
+            final platform = CollisionBlock(
+              position: Vector2(collision.x, collision.y),
+              size: Vector2(collision.width, collision.height),
+              blockType: 'platform',
+            );
+            collisionBlocks.add(platform);
+            add(platform);
+            break;
+          case 'Wall':
+            final platform = CollisionBlock(
+              position: Vector2(collision.x, collision.y),
+              size: Vector2(collision.width, collision.height),
+              blockType: 'wall',
+            );
+            collisionBlocks.add(platform);
+            add(platform);
+            break;
+          default:
+            final block = CollisionBlock(
+              position: Vector2(collision.x, collision.y),
+              size: Vector2(collision.width, collision.height),
+              blockType: "death",
+            );
+            collisionBlocks.add(block);
+            add(block);
+        }
+      }
+    }
     return super.onLoad();
   }
-
 }
