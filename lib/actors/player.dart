@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
+import 'package:my_app/components/fruit.dart';
 import 'package:my_app/levels/collision_block.dart';
 import 'package:my_app/pixel_adventure.dart';
 
@@ -33,9 +34,11 @@ class Player extends SpriteAnimationGroupComponent
   final double terminalVelocity = 150;
   bool hasJumped = false;
 
+  late final RectangleHitbox hitbox;
+
   @override
   void update(double dt) {
-    // _applyGravity(dt);
+    _applyGravity(dt);
     _applyJump();
     _updatePlayerState();
     _updatePlayerMovement(dt);
@@ -45,8 +48,12 @@ class Player extends SpriteAnimationGroupComponent
   @override
   FutureOr<void> onLoad() {
     _loadAllAnimation();
+
+    // Update the hitbox position with the offset
+    hitbox = RectangleHitbox();
+
+    add(hitbox);
     debugMode = true;
-    add(RectangleHitbox());
   }
 
   @override
@@ -68,10 +75,20 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   @override
+  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is Fruit){
+      other.isCollected = true;
+      other.collectedByPlayer();
+    }
+    super.onCollisionStart(intersectionPoints, other);
+  }
+
+  @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     if (other is CollisionBlock) {
       // Calculate overlap and minimum translation vector (MTV)
       final playerRect = toRect();
+      // final playerRect = hitbox.toRect();
       final wallRect = other.toRect();
       final overlap = playerRect.intersect(wallRect);
 

@@ -8,10 +8,8 @@ class CollisionBlock extends PositionComponent {
     : super(position: position, size: size);
 
   @override
-  bool get debugMode => true;
-
-  @override
   void onLoad() {
+    debugMode = true;
     final hitBox = RectangleHitbox();
     hitBox.collisionType = CollisionType.passive;
     add(hitBox);

@@ -40,6 +40,9 @@ class PixelAdventure extends FlameGame
     if (isShowJoyStick) {
       addJoyStick();
     }
+
+    // final gameSize = size;
+    // print("Game size: $gameSize");
   }
 
   @override
