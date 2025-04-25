@@ -5,6 +5,7 @@ import 'package:flame_tiled/flame_tiled.dart';
 import 'package:my_app/actors/player.dart';
 import 'package:my_app/components/background_tile.dart';
 import 'package:my_app/components/fruit.dart';
+import 'package:my_app/components/saw.dart';
 import 'package:my_app/levels/collision_block.dart';
 import 'package:my_app/pixel_adventure.dart';
 
@@ -41,10 +42,26 @@ class Level extends World
             add(player);
             break;
           case 'fruit':
-            final fruit = Fruit(fruit: spawnPoint.name,
-                position: Vector2(spawnPoint.x, spawnPoint.y),
-                size: Vector2(spawnPoint.width, spawnPoint.height));
+            final fruit = Fruit(
+              fruit: spawnPoint.name,
+              position: Vector2(spawnPoint.x, spawnPoint.y),
+              size: Vector2(spawnPoint.width, spawnPoint.height),
+            );
             add(fruit);
+          case 'saw':
+            final bool isVertical = spawnPoint.properties.getValue(
+              'isVertical',
+            );
+            final int offNeg = spawnPoint.properties.getValue('offNeg');
+            final int offPos = spawnPoint.properties.getValue('offPos');
+            final saw = Saw(
+              isVertical: isVertical,
+              offNeg: offNeg,
+              offPos: offPos,
+              position: Vector2(spawnPoint.x, spawnPoint.y),
+              size: Vector2(spawnPoint.width, spawnPoint.height),
+            );
+            add(saw);
           default:
         }
       }

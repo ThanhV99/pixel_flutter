@@ -4,12 +4,11 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import 'package:my_app/components/fruit.dart';
+import 'package:my_app/components/saw.dart';
 import 'package:my_app/levels/collision_block.dart';
 import 'package:my_app/pixel_adventure.dart';
 
 enum PlayerState { idle, running }
-
-enum PlayerDirection { left, right, none }
 
 class Player extends SpriteAnimationGroupComponent
     with HasGameRef<PixelAdventure>, KeyboardHandler, CollisionCallbacks {
@@ -21,7 +20,6 @@ class Player extends SpriteAnimationGroupComponent
   late final SpriteAnimation runningAnimation;
 
   // control player moving
-  PlayerDirection playerDirection = PlayerDirection.none;
   double moveSpeed = 100;
   Vector2 velocity = Vector2.zero();
   bool isFacingRight = true;
@@ -33,6 +31,7 @@ class Player extends SpriteAnimationGroupComponent
   final double jumpSpeed = 300;
   final double terminalVelocity = 150;
   bool hasJumped = false;
+  Vector2 startingPosition = Vector2.zero();
 
   late final RectangleHitbox hitbox;
 
@@ -51,8 +50,9 @@ class Player extends SpriteAnimationGroupComponent
 
     // Update the hitbox position with the offset
     hitbox = RectangleHitbox();
-
     add(hitbox);
+
+    startingPosition = Vector2(position.x, position.y);
     debugMode = true;
   }
 
@@ -79,6 +79,8 @@ class Player extends SpriteAnimationGroupComponent
     if (other is Fruit){
       other.isCollected = true;
       other.collectedByPlayer();
+    } else if (other is Saw){
+      _respawn();
     }
     super.onCollisionStart(intersectionPoints, other);
   }
@@ -207,5 +209,9 @@ class Player extends SpriteAnimationGroupComponent
     }
 
     velocity.y = velocity.y.clamp(-jumpSpeed, terminalVelocity);
+  }
+
+  void _respawn(){
+    position = startingPosition;
   }
 }
